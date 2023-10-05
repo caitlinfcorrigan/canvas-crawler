@@ -64,35 +64,82 @@ console.log("Hello, Canvas!")
     // drawBox(50,100,35,75,"hotpink")
 
     // Handle keyboard input from the user
-    function movementHandler(e) {
-        const speed = 10; // How many pixels the hero moves per key
-        // Console.log to find the key or code from the event!
-            // console.log(e)
-        // One variable that can have many values and each value has a different chunk of code to run, use a switch case
-        switch(e.key) {
-            // Cases are case sensitive!
-            // Can do "switch(e.key.toLowerCase())"
-            case "ArrowUp":
-                hero.y-= speed;
-                // console.log("Move hero up")
-                break;
-            case "ArrowDown": 
-                hero.y+= speed;
-                // console.log("Move hero down")
-                break;
-            case "ArrowLeft":
-                hero.x-= speed;
-                // console.log("Move hero left")
-                break;
-            case "ArrowRight":
-                hero.x+= speed;
-                // console.log("Move hero right")
-                break;
-            default:
-                // Like an else; for any other case
-                console.log(`${e.key} not recognized`)
+    // OG basic movement handler
+        // function movementHandler(e) {
+        //     const speed = 10; // How many pixels the hero moves per key
+        //     // Console.log to find the key or code from the event!
+        //         // console.log(e)
+        //     // One variable that can have many values and each value has a different chunk of code to run, use a switch case
+        //     switch(e.key) {
+        //         // Cases are case sensitive!
+        //         // Can do "switch(e.key.toLowerCase())"
+        //         case "ArrowUp":
+        //             hero.y-= speed;
+        //             // console.log("Move hero up")
+        //             break;
+        //         case "ArrowDown": 
+        //             hero.y+= speed;
+        //             // console.log("Move hero down")
+        //             break;
+        //         case "ArrowLeft":
+        //             hero.x-= speed;
+        //             // console.log("Move hero left")
+        //             break;
+        //         case "ArrowRight":
+        //             hero.x+= speed;
+        //             // console.log("Move hero right")
+        //             break;
+        //         default:
+        //             // Like an else; for any other case
+        //             console.log(`${e.key} not recognized`)
+        //     }
+        // }
+
+    // Advanced movement handler (for diagonal)
+    const currentlyPressedKeys = {}
+    console.log(currentlyPressedKeys);
+    function movementHandler() {
+        const speed = 10;
+        if (currentlyPressedKeys["ArrowUp"]) {
+            let isDiagnal = false;
+            if (currentlyPressedKeys["ArrowLeft"] || currentlyPressedKeys["ArrowRight"]) {
+                isDiagnal = true;
+            }
+            hero.y -= isDiagnal ? speed * .75 : speed;
+        }
+        if (currentlyPressedKeys["ArrowDown"]) {
+            let isDiagnal = false;
+            if (currentlyPressedKeys["ArrowLeft"] || currentlyPressedKeys["ArrowRight"]) {
+                isDiagnal = true;
+            }
+            hero.y += isDiagnal ? speed * .75 : speed;
+        } 
+        if (currentlyPressedKeys["ArrowLeft"]) {
+            let isDiagnal = false;
+            if (currentlyPressedKeys["ArrowUp"] || currentlyPressedKeys["ArrowDown"]) {
+                isDiagnal = true;
+            }
+            hero.x -= isDiagnal ? speed * .75 : speed;
+    
+        } 
+        if (currentlyPressedKeys["ArrowRight"]) {
+            let isDiagnal = false;
+            if (currentlyPressedKeys["ArrowUp"] || currentlyPressedKeys["ArrowDown"]) {
+                isDiagnal = true;
+            }
+            hero.x += isDiagnal ? speed * .75 : speed;
+        } 
+        
+        // multiple keys example
+        if (currentlyPressedKeys["f"] && currentlyPressedKeys["g"]) {
+            console.log("you have unlocked the secret code!");
+            ogre.x--;
+            ogre.y--;
         }
     }
+    
+
+
     // Collision detection algorithm (using a bounding box to find intersection)
     function detectHit() {
         // AABB - axis-aligned bounding box algorithm
@@ -119,6 +166,7 @@ console.log("Hello, Canvas!")
     // Create a game loop -- run the business logic of the game and be called by a setInterval
     const gameInterval = setInterval(gameLoop, 80);
     function gameLoop() {
+        movementHandler();
         // Clear the canvas (from (0,0) to max width & height)
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // Render all game objects
@@ -146,5 +194,8 @@ console.log("Hello, Canvas!")
         drawBox(e.offsetX, e.offsetY, 30, 30, "hotpink");
     })
 
-// Keypress event listener
-document.addEventListener("keydown", movementHandler);
+    // Keypress event listener -- used by old movementHandler
+    // document.addEventListener("keydown", movementHandler);
+// New keypress event listeners
+    document.addEventListener('keydown', e => currentlyPressedKeys[e.key] = true);
+    document.addEventListener('keyup', e => currentlyPressedKeys[e.key] = false);
