@@ -93,7 +93,28 @@ console.log("Hello, Canvas!")
                 console.log(`${e.key} not recognized`)
         }
     }
-    // Collision detection algorithm
+    // Collision detection algorithm (using a bounding box to find intersection)
+    function detectHit() {
+        // AABB - axis-aligned bounding box algorithm
+        // Check for collisions on each side of each object
+        // If each boundary is passed, a collision is detected
+
+        // Top of ogre
+        const top = hero.y + hero.height >= ogre.y;
+        // Bottom of ogre
+        const bottom = hero.y <= ogre.y + ogre.height
+        // Left of ogre
+        const left = hero.x + hero.width >= ogre.x;
+        // Right of ogre
+        const right = hero.x <= ogre.x + ogre.width;
+        // console.log(`top: ${top} bottom: ${bottom} left: ${left} right: ${right}`)
+
+        if (top && bottom && left && right) {
+            return true;
+        }
+        // If no collision, then return false
+        return false;
+    }
 
     // Create a game loop -- run the business logic of the game and be called by a setInterval
     const gameInterval = setInterval(gameLoop, 80);
@@ -102,8 +123,17 @@ console.log("Hello, Canvas!")
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // Render all game objects
         hero.render();
-        ogre.render();
+        if (ogre.alive) {
+            ogre.render();
+        }
         // Do game loop
+        if(detectHit()) {
+            // The game is over
+            // The ogre dies
+            ogre.alive = false;
+            // Display message to user in the Status
+            status.innerText = "You slayed Shrek! :("
+        };
 
     }
 
